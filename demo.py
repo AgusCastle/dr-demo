@@ -43,19 +43,12 @@ def demo(device, path_models, path_images):
         for img in list_images(path_images):
             key = Path(img).stem
             
-            gradcam = viewGradCam(model, str(Path(i).stem), 1, img, 1)
+            pred, gradcam = viewGradCam(model, str(Path(i).stem), img, 1)
             path = img
-            img = Image.open(img)
-        
-            img = transform(img)
-            img = img.to(device)
-            img = img[None, :, :, :]
-
-            pred = model(img)
 
             ss = pred.tolist()[0]
             arg = int(torch.argmax(pred))
-            
+
 
             print('Model {}, Prediction : {}'.format(str(Path(i).stem), arg))
 
@@ -87,15 +80,6 @@ def demo(device, path_models, path_images):
                 final.append(gradcam)
 
         dst = argmaxPlot(final)
-
-        # dst = None
-        # for i, gray in enumerate(final):    
-        #     if i == 0:
-        #         continue
-        #     if i == 1:
-        #         dst = cv2.addWeighted(final[0], 1, gray, 1, 0.0)
-        #         continue
-        #     dst += cv2.addWeighted(dst, 1, gray, 1, 0.0)
 
         img = np.array(Image.open(element['path']))
         img = cv2.resize(img, (512, 512))

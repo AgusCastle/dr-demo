@@ -12,7 +12,7 @@ from PIL import Image
 import torch
 
 
-def viewGradCam(model, tipo:str ,cat: int, img_path: str, device : int = 0):
+def viewGradCam(model, tipo:str , img_path: str, device : int = 0):
     
     model.eval()
     img = np.array(Image.open(img_path))
@@ -22,7 +22,10 @@ def viewGradCam(model, tipo:str ,cat: int, img_path: str, device : int = 0):
 
     input_tensor = input_tensor.to(device)
 
-    targets = [ClassifierOutputTarget(cat)]
+    pred = model(input_tensor)
+    target = int(torch.argmax(pred))
+
+    targets = [ClassifierOutputTarget(target)]
 
     if tipo == 'convnext_0000':
         target_layers = [model.features]
@@ -30,26 +33,13 @@ def viewGradCam(model, tipo:str ,cat: int, img_path: str, device : int = 0):
         target_layers = [model.attnblocks.cab_]
     else:
         target_layers = [model.attb.cab_]
+
     with GradCAM(model=model, target_layers=target_layers) as cam:
         grayscale_cams = cam(input_tensor=input_tensor, targets=targets)
         cam_image = show_cam_on_image(img, grayscale_cams[0, :], use_rgb=True)
     cam = np.uint8(255*grayscale_cams[0, :])
-
-    xcam =np.uint8(255*grayscale_cams[0, :])
-
-    xcam = cv2.merge([cam, cam, cam])
-    images = np.hstack((np.uint8(255*img), xcam , cam_image))
     
-    if tipo == 'convnext_0000':
-        Image.fromarray(images).show()
-        input()
-    elif tipo == 'convnext_0001':
-        Image.fromarray(images).show()
-        input()
-    # Image.fromarray(cam).show()
-
-    # Image.fromarray(images).show()
-    return cam
+    return pred, cam
 
 def show_cam_on_image(img: np.ndarray,
                       mask: np.ndarray,
