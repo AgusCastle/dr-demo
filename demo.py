@@ -15,11 +15,19 @@ def list_models(paths):
     return glob(os.path.join(paths, '*.pth'))
 
 def list_images(paths):
-    return glob(os.path.join(paths, '*.jpg'))
 
-def demo(device, path_models, path_images):
+    exts = ['*.jpg', '*.png', '*.tiff', '*.jpeg']
+    total = []
+    for ext in exts:
+        total.extend(glob(os.path.join(paths, ext)))
+
+    return total
+
+def demo(device, runs ,path_models = './checkpoints', path_images = './images'):
 
     device = torch.device(device)
+
+    images_save = createRuns(runs)
 
     dict_gradcams = {}
     for model in list_models(path_models):
@@ -57,7 +65,7 @@ def demo(device, path_models, path_images):
     model = model.to(device)
     model.eval()
 
-    for element in dict_gradcams.values():
+    for name, element in zip(dict_gradcams.keys(),dict_gradcams.values()):
 
         s = element['softscore']
         s = torch.permute(torch.FloatTensor(s), (1, 0)).to(device)
@@ -77,7 +85,7 @@ def demo(device, path_models, path_images):
         img = cv2.resize(img, (512, 512))
         img = np.float32(img) / 255
     
-        Image.fromarray(show_cam_on_image(img, cv2.normalize(dst,None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F), use_rgb=True)).show()
+        Image.fromarray(show_cam_on_image(img, cv2.normalize(dst,None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F), use_rgb=True)).save('{}/{}_{}.png'.format(images_save, pred, name))
         
 def argmaxPlot(list_grayscales):
 
@@ -107,7 +115,20 @@ def changeLogSoftmaxbySoftmax(model, flag):
         model.attb.fc_[8] = torch.nn.Sequential(torch.nn.Softmax(dim=1))
     
     return model
-demo(1, './checkpoints', './images')
+
+def createRuns(path):
+    root = path
+    path = path + '/runs'
+    i = 1
+    while os.path.exists(path):
+        i += 1
+        path = path + str(i)
+    os.makedirs(path)
+    print('Your gradcam_images is here {}'.format(path))
+
+    return path
+
+#demo(1, './checkpoints', './images')
 
 
 
