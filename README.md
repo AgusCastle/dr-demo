@@ -1,8 +1,8 @@
 # dr-demo
 
-# Pesos de los modelos ConvNeXt y nuestra SNF
+# Model weights ConvNeXt y our SNF
 
-Clona este repositorio y agrega las carpetas que falten como se muestra:
+Clone this repository and append the required folders as follows:
 ````
 dr-demo
     |
@@ -25,7 +25,7 @@ dr-demo
 
 Download models [here](https://drive.google.com/drive/folders/18FrgUq9dw8Ww0Z0brVnBBz3TduTZGb_n?usp=sharing)
 
-Mover los modelos dentro de la carpeta 'checkpoints'.
-Las imagenes que se predeciran seran guardas en una ruta especificada en main.py
+Move the models into the 'checkpoints' folder.
+The images to be predicted will be stored in a path specified in ***main.py***.
 
 Run main.py --save_path ./ --device 0
