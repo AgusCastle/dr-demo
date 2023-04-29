@@ -6,7 +6,7 @@ from glob import glob
 from torchvision import transforms
 from pathlib import Path
 from utils.gradcam import viewGradCam, show_cam_on_image
-from models.sparse import SparseFusion
+
 import numpy as np
 import cv2
 import pdb
@@ -60,6 +60,7 @@ def demo(device, runs ,path_models = './checkpoints', path_images = './images'):
                 dict_gradcams.get(key)['cam'].append(gradcam)
 
     model = torch.load('checkpoints/snfw2.pt', map_location=device)
+    print(model)
     model = model['model']
     
     model = model.to(device)
@@ -118,7 +119,7 @@ def changeLogSoftmaxbySoftmax(model, flag):
 
 def createRuns(path):
     root = path
-    path = path + '/runs'
+    path = path + 'runs'
     i = 1
     while os.path.exists(path):
         i += 1

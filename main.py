@@ -1,6 +1,7 @@
 import argparse
 import os
 from demo import demo
+from models.sparse import SparseFusion
 
 if __name__ == '__main__':
 
