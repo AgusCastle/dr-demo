@@ -10,14 +10,27 @@ from pytorch_grad_cam.utils.image import show_cam_on_image, \
     preprocess_image
 from PIL import Image
 import torch
+from torchvision import transforms
 
 
 def viewGradCam(model, tipo:str , img_path: str, device : int = 0):
     
     model.eval()
-    img = np.array(Image.open(img_path))
-    img = cv2.resize(img, (512, 512))
-    img = np.float32(img) / 255
+    trans = transforms.Compose([
+                transforms.Resize(512),
+                transforms.CenterCrop(512),
+                transforms.ToTensor(),
+                ])
+    
+    img = Image.open(img_path)
+
+    img = trans(img)
+
+
+    img = torch.permute(img, (1,2,0))
+    
+    img = np.array(img) 
+    #img = np.float32(img) / 255
     input_tensor = preprocess_image(img, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     input_tensor = input_tensor.to(device)
@@ -38,6 +51,13 @@ def viewGradCam(model, tipo:str , img_path: str, device : int = 0):
         grayscale_cams = cam(input_tensor=input_tensor, targets=targets)
         cam_image = show_cam_on_image(img, grayscale_cams[0, :], use_rgb=True)
     cam = np.uint8(255*grayscale_cams[0, :])
+
+    if tipo in ['convnext_0000', 'convnext_0001']:
+        camd = np.uint8(255*grayscale_cams[0, :])
+        camd = cv2.merge([camd, camd, camd])
+        images = np.hstack((np.uint8(255*img), camd , cam_image))
+        Image.fromarray(images).show()
+        input()
     
     return pred, cam
 

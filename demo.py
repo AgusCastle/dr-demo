@@ -43,7 +43,7 @@ def demo(device, runs ,path_models = './checkpoints', path_images = './images'):
         for img in list_images(path_images):
             key = Path(img).stem
             
-            pred, gradcam = viewGradCam(model, str(Path(i).stem), img, 1)
+            pred, gradcam = viewGradCam(model, str(Path(i).stem), img, 0)
             path = img
 
             ss = pred.tolist()[0]
