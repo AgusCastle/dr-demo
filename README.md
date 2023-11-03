@@ -1,6 +1,6 @@
 # dr-demo
 
-# Model weights ConvNeXt y our SNF
+# Diabetic Rethinopaty : Models weights ConvNeXt and our SNF
 
 Clone this repository and append the required folders as follows:
 ````
